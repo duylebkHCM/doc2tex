@@ -1,0 +1,63 @@
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND noninteractive
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ARG PATH="/root/miniconda3/bin:${PATH}"
+
+RUN apt-get update \
+    && apt-get install -y apt-utils htop python3-dev wget git build-essential checkinstall \
+    && apt-get install -y chrpath cm-super-minimal dh-exec diffstat doxygen doxygen-latex graphviz \
+    jdupes libann0 libapt-pkg-perl libb-hooks-endofscope-perl libb-hooks-op-check-perl libbz2-dev \
+    libcapture-tiny-perl libcdt5 libcgraph6 libclang1-10 libclass-method-modifiers-perl libclass-xsaccessor-perl \
+    libclone-perl libcpanel-json-xs-perl libdevel-callchecker-perl libdevel-size-perl libdigest-hmac-perl \
+    libdjvulibre-dev libdynaloader-functions-perl libemail-valid-perl libexporter-tiny-perl libfftw3-bin \
+    libfftw3-dev libfftw3-long3 libfftw3-quad3 libfile-find-rule-perl libfont-ttf-perl libfuture-perl libgts-0.7-5 \
+    libgvc6 libgvpr2 libimport-into-perl libio-async-loop-epoll-perl libio-async-perl libio-pty-perl libio-string-perl \
+    libipc-run-perl libjson-maybexs-perl liblab-gamut1 liblcms2-dev liblinux-epoll-perl \
+    liblist-compare-perl liblist-moreutils-perl liblqr-1-0-dev libmime-charset-perl libmodule-implementation-perl \
+    libmodule-runtime-perl libmoo-perl libmoox-aliases-perl libnamespace-clean-perl \
+    libnet-dns-perl libnet-domain-tld-perl libnet-ip-perl libnumber-compare-perl libpackage-stash-perl \
+    libparams-classify-perl libpath-tiny-perl libpathplan4 libperl-dev librole-tiny-perl librsvg2-bin \
+    librsvg2-dev libsereal-decoder-perl libsereal-encoder-perl libsombok3 libstrictures-perl libstruct-dumb-perl \
+    libsub-exporter-progressive-perl libsub-identify-perl libsub-name-perl libsub-quote-perl \
+    libtext-glob-perl libtext-levenshtein-perl libtype-tiny-perl libunicode-linebreak-perl libunicode-utf8-perl \
+    libvariable-magic-perl libwebp-dev libwmf-dev libxapian30 libxml-libxml-perl \
+    libxml-namespacesupport-perl libxml-sax-base-perl libxml-sax-perl libxml-writer-perl libxml2-dev libxt-dev \
+    libyaml-libyaml-perl lintian patchutils pkg-kde-tools texlive-extra-utils texlive-font-utils xsltproc
+
+RUN cd /opt \
+    && wget https://download.imagemagick.org/ImageMagick/download/releases/ImageMagick-7.1.0-18.tar.xz \
+    && tar -xvf ImageMagick-7.1.0-18.tar.xz \
+    && cd ImageMagick-* \
+    && touch configure \
+    && ./configure \
+    && make \
+    && make install \
+    && ldconfig /usr/local/lib \
+    && make check
+
+RUN convert --version
+
+RUN apt-get install -y texlive-latex-base \
+    && apt-get install -y texlive-fonts-recommended \
+    && apt-get install -y texlive-fonts-extra \
+    && apt-get install -y texlive-latex-extra
+
+RUN apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN cd /root
+
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && mkdir /root/.conda \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+RUN conda --version
+
+COPY requirements.txt src/
+RUN conda create -y -n im2latex_infer python=3.8
+RUN /bin/bash -c "source activate im2latex_infer \
+                    && cd src \
+                    && pip install --no-cache-dir -r requirements.txt"
