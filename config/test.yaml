@@ -1,0 +1,59 @@
+imgH: null
+imgW: null
+max_dimension: [448, 960]
+min_dimension: [32, 32]
+batch_max_length: 500
+rgb: False
+data_filtering: True
+pad: False
+beam_size: 5
+mean: 0.5
+std: 0.5
+
+num_gpu: 0
+batch_size: 0
+workers: 0
+postprocess: False
+downsample: 2
+
+FeatureExtraction:
+  name: 'None'
+
+SequenceModeling:
+  name: 'ViT'
+  params:
+    backbone:
+      name: 'resnet'
+      input_channel: 1 # gray scale
+      output_channel: 512
+      gcb: False
+    fix_embed: True
+    input_channel: 1
+    patching_style: '2d'
+    patch_size: [2,2]
+    depth: 6
+    num_heads: 8
+    hidden_size: 256
+
+Prediction:
+  name: 'Attnv2'
+  params:
+    seqmodel: 'TFM'
+    input_size: 256
+    hidden_size: 256
+    kernel_size: 2
+    kernel_dim: 128
+    embed_target: True
+    enc_init: True
+    attn_type: 'coverage'
+    method: 'concat'
+    teacher_forcing: 1.0
+    droprate: 0.2
+
+export_csv: True
+sanity_check: False
+manualSeed: 1111
+
+vocab: ''
+character: []
+saved_model: '/media/huynhtruc0309/DATA/Math_Expression/my_source/Math_Recognition/saved_models/math_recognition/limd_experiment/hybrid/best_ckpt_accuracy.pth'

@@ -1,0 +1,82 @@
+imgH: null
+imgW: null
+max_dimension: [800, 800]
+min_dimension: [32, 32]
+batch_max_length: 150
+keep_smaller_batches: True
+rgb: False
+data_filtering_off: True
+mean: 0.5
+std: 0.5
+augment: True
+
+batch_size: 32
+workers: -1
+postprocess: False
+
+FeatureExtraction:
+  name: 'None'
+
+SequenceModeling:
+  name: 'ViT'
+  params:
+    backbone:
+      name: 'resnet'
+      input_channel: 1 # gray scale
+      output_channel: 512
+      gcb: False
+    fix_embed: True
+    input_channel: 1
+    patching_style: '2d'
+    patch_size: [2,2]
+    depth: 6
+    num_heads: 8
+    hidden_size: 256
+
+Prediction:
+  name: 'Attnv2'
+  params:
+    seqmodel: 'TFM'
+    input_size: 256
+    hidden_size: 256
+    kernel_size: 2
+    kernel_dim: 128
+    embed_target: True
+    enc_init: True
+    attn_type: 'coverage'
+    method: 'concat'
+    teacher_forcing: 1.0
+    droprate: 0.25
+
+export_csv: False
+sanity_check: False
+
+vocab: 'vocab.txt'
+character: []
+train_data: 'train_data'
+valid_data: 'validate_data'
+
+criterion:
+  name: 'entropy'
+  reduction: 'none'
+  ignore_index: 0
+  weight: null
+  loss_args: null
+
+optimizer:
+  opt: 'adamw'
+  lr: 0.0005
+  weight_decay: 0.000002
+  momentum: 0.9
+
+filter_bias_and_bn: True
+min_lr: 0.00001
+warmup_epochs: 5
+scheduler: True
+
+grad_clip: 5.0
+early_stop: 300000
+num_iter: 300000
+valInterval: 5000
+logInterval: 100
+manualSeed: 1111

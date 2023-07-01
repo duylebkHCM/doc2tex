@@ -1,0 +1,6 @@
+saved_models/
+result/
+pretrained_model/
+api/
+*/.dockerignore
+tools/
