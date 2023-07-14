@@ -4,6 +4,7 @@
   <a href="https://github.com/duylebkHCM/doc2tex/LICENSE"><img alt="Apache License" src="https://img.shields.io/github/license/duylebkHCM/doc2tex" /></a>
   <a href="https://hub.docker.com/r/duybktiengiang1603/doc2tex"><img alt="Apache License" src="https://img.shields.io/docker/pulls/duybktiengiang1603/doc2tex?logo=docker" /></a>
   <a href="https://huggingface.co/spaces/duycse1603/thesis_demo"><img alt="Apache License" src="https://img.shields.io/badge/🤗%20Hugging%20Face-Spaces-blue" /></a>
+  <a href="https://www.codefactor.io/repository/github/duylebkhcm/doc2tex"><img src="https://www.codefactor.io/repository/github/duylebkhcm/doc2tex/badge" alt="CodeFactor" /></a>
 
 </p>
 
