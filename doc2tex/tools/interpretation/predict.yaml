@@ -1,0 +1,49 @@
+imgH: null
+imgW: null
+max_dimension: [800, 800]
+min_dimension: [32, 32]
+batch_max_length: 500
+rgb: False
+pad: False
+mean: 0.5
+std: 0.5
+
+vocab: '../../analysis/cviu_analysis/dataset_analysis/deng_processed/lmdb_data/vocab.txt'
+character: []
+
+FeatureExtraction:
+  name: 'None'
+
+SequenceModeling:
+  name: 'ViT'
+  params:
+    backbone:
+      name: 'resnet'
+      input_channel: 1 # gray scale
+      output_channel: 512
+      gcb: False
+    fix_embed: True
+    input_channel: 1
+    patching_style: '2d'
+    patch_size: [2,2]
+    depth: 6
+    num_heads: 8
+    hidden_size: 256
+
+Prediction:
+  name: 'Attnv2'
+  params:
+    seqmodel: 'TFM'
+    input_size: 256
+    hidden_size: 256
+    kernel_size: 2
+    kernel_dim: 128
+    embed_target: True
+    enc_init: True
+    attn_type: 'coverage'
+    method: 'concat'
+    teacher_forcing: 1.0
+    droprate: 0.25
+    viz_attn: True
+
+saved_model: '../../saved_models/math_recognition/dicta_experiment/best_final_model/best_ckpt_accuracy.pth'

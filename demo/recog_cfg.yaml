@@ -1,0 +1,61 @@
+common:
+  imgH: null
+  imgW: null
+
+  FeatureExtraction:
+    name: 'None'
+
+  SequenceModeling:
+    name: 'ViT'
+    params:
+      backbone:
+        name: 'resnet'
+        input_channel: 1 # gray scale
+        output_channel: 512
+        gcb: False
+      fix_embed: True
+      input_channel: 1
+      patching_style: '2d'
+      patch_size: [2,2]
+      depth: 6
+      num_heads: 8
+      hidden_size: 256
+
+  Prediction:
+    name: 'Attnv2'
+    params:
+      seqmodel: 'TFM'
+      input_size: 256
+      hidden_size: 256
+      kernel_size: 2
+      kernel_dim: 128
+      embed_target: True
+      enc_init: True
+      attn_type: 'coverage'
+      method: 'concat'
+      teacher_forcing: 1.0
+      droprate: 0.25
+
+  mean: 0.5
+  std: 0.5
+  pad: True
+  beam_size: 10
+  rgb: False
+  character: []
+  resizer: False
+
+
+version1:
+  max_dimension: [800, 800]
+  min_dimension: [32, 32]
+  batch_max_length: 500
+  vocab: 'saved_models/math_recog/version1/vocab.txt'
+  weight_path: 'saved_models/math_recog/version1/best_weights.pth'
+
+
+version2:
+  max_dimension: [224, 960]
+  min_dimension: [32, 32]
+  batch_max_length: 200
+  vocab: 'saved_models/math_recog/version2/vocab.txt'
+  weight_path: 'saved_models/math_recog/version2/best_weights.pth'
