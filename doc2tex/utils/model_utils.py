@@ -7,15 +7,15 @@ from collections import OrderedDict
 
 import torch
 from torch import nn
-from modules import build_model
-from modules.converter import builder
+from doc2tex.modules import build_model
+from doc2tex.modules.converter import builder
 from collections import OrderedDict
 import csv
 import math
 
-from modules.component.feature_extractor import ResNet_FeatureExtractor
-from modules.component.seq_modeling.addon_module import PatchEmbed, HybridEmbed
-from modules.component.common import resize_pos_embed
+from doc2tex.modules.component.feature_extractor import ResNet_FeatureExtractor
+from doc2tex.modules.component.seq_modeling.addon_module import PatchEmbed, HybridEmbed
+from doc2tex.modules.component.common import resize_pos_embed
 
 
 class Averager(object):

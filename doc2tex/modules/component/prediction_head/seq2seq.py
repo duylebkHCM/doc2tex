@@ -3,8 +3,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import repeat
-from modules.converter import AttnLabelConverter as ATTN
-from modules.component.prediction_head.addon_module import *
+from ...converter import AttnLabelConverter as ATTN
+from ..prediction_head.addon_module import *
 
 
 class Attention(nn.Module):

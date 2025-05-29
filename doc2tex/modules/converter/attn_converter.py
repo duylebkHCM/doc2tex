@@ -8,8 +8,7 @@ class AttnLabelConverter(object):
     list_token = ["[GO]", "[s]", "[UNK]"]
 
     def __init__(self, character, device):
-        list_character = character
-        self.character = AttnLabelConverter.list_token + list_character
+        self.character = AttnLabelConverter.list_token + character
 
         self.device = device
         self.dict = {}

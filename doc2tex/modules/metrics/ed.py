@@ -1,5 +1,4 @@
 import Levenshtein
-from nltk.metrics.distance import edit_distance
 
 
 def get_single_ED(gt, pred):
@@ -7,9 +6,9 @@ def get_single_ED(gt, pred):
     if len(gt) == 0 or len(pred) == 0:
         norm_ED = 0
     elif len(gt) > len(pred):
-        norm_ED = 1 - edit_distance(pred, gt) / len(gt)
+        norm_ED = 1 - Levenshtein.distance(pred, gt) / len(gt)
     else:
-        norm_ED = 1 - edit_distance(pred, gt) / len(pred)
+        norm_ED = 1 - Levenshtein.distance(pred, gt) / len(pred)
     return norm_ED
 
 

@@ -4,7 +4,7 @@ import kornia as K
 import kornia.augmentation as kor
 import albumentations as alb
 from albumentations.pytorch.transforms import ToTensorV2
-from utils.general_utils import to_3tuple
+from doc2tex.utils.general_utils import to_3tuple
 
 
 class Math_Transform(nn.Module):
@@ -32,7 +32,6 @@ class Math_Transform(nn.Module):
 
     @torch.no_grad()
     def forward(self, image: torch.Tensor) -> torch.Tensor:
-        assert image.device.type == "cuda"
         image = torch.clamp(image, min=0.0, max=255.0)
         image = image.div(255.0)
         image = self.transform(image)

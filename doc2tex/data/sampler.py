@@ -9,9 +9,9 @@ class ClusterRandomSampler(Sampler):
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.drop_last = drop_last
+        self.batch_lists = self.get_batch_lists()
 
-    @cached_property
-    def batch_lists(self):
+    def get_batch_lists(self):
         batch_lists = []
         all_cluster_indices = getattr(self.data_source, "cluster_batch_indices", [])
 
@@ -48,7 +48,8 @@ class ClusterRandomSampler(Sampler):
         return batch_indices
 
     def __iter__(self):
-        return iter(self.batch_lists)
+        batch_lists = self.get_batch_lists()
+        return iter(batch_lists)
 
     def __len__(self):
         return len(self.batch_lists)

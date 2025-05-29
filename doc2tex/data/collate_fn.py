@@ -3,7 +3,7 @@ import torch
 from typing import List, Tuple
 import cv2
 import numpy as np
-from transform.geo_transform import geometry_transform
+from doc2tex.transform.geo_transform import geometry_transform
 
 
 class ClusterCollate:

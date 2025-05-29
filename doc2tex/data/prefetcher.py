@@ -7,11 +7,11 @@ class PrefetchLoader:
     def __init__(
         self,
         loader,
-        device=torch.device("cuda"),
+        device: str,
     ):
         self.loader = loader
         self.device = device
-        self.is_cuda = torch.cuda.is_available() and device.type == "cuda"
+        self.is_cuda = torch.cuda.is_available() and device == "cuda"
 
     def __iter__(self):
         first = True

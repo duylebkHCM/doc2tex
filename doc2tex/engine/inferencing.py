@@ -2,12 +2,11 @@ import time
 import torch
 import torch.utils.data
 import torch.nn.functional as F
-
-from torchtext.data import metrics
-from utils.model_utils import Averager
-from utils.data_utils import Postprocessing
-from modules.metrics import ed
+from doc2tex.utils.model_utils import Averager
+from doc2tex.utils.data_utils import Postprocessing
+from doc2tex.modules.metrics import ed, bleu
 from functools import reduce
+from tqdm import tqdm
 
 
 def validation_step(
@@ -16,7 +15,6 @@ def validation_step(
     criterion,
     evaluation_loader,
     converter,
-    tokenizer,
     config,
     args,
     device,
@@ -43,14 +41,14 @@ def validation_step(
         fo = open(save_path, "wt")
         writer = csv.writer(fo)
 
-    for i, (image_tensors, labels, img_names) in enumerate(evaluation_loader):
+    for _, (image_tensors, labels, img_names) in enumerate(tqdm(evaluation_loader, total=len(evaluation_loader), desc='Validation')):
         if image_tensors is None and labels is None and img_names is None:
             break
 
         batch_size = image_tensors.size(0)
         length_of_data = length_of_data + batch_size
 
-        assert image_tensors.device.type == device.type
+        assert image_tensors.device.type == device
 
         if augment:
             image_tensors = torch.clamp(image_tensors, min=0.0, max=255.0)
@@ -68,7 +66,7 @@ def validation_step(
                 labels, batch_max_length=config["batch_max_length"]
             )
             if config["use_amp"]:
-                with torch.cuda.amp.autocast():
+                with torch.autocast(device_type=device):
                     preds_index, preds, _ = model(
                         image_tensors, text_for_pred, is_train=False
                     )
@@ -76,8 +74,10 @@ def validation_step(
                 preds_index, preds, _ = model(
                     image_tensors, text_for_pred, is_train=False
                 )
+                
             forward_time = time.time() - start_time
             infer_time += forward_time
+            
             target = text_for_loss[:, 1:]  # without [GO] Symbol
             costs = criterion(
                 preds.contiguous().view(-1, preds.shape[-1]),
@@ -85,15 +85,12 @@ def validation_step(
             )
             costs = costs.view(batch_size, -1).mean(dim=1)
             valid_loss_avg.add(costs)
-            all_loss += costs.detach().cpu().numpy().tolist()
+            
+            all_loss += costs.cpu().numpy().tolist()
             labels = converter.decode(
                 text_for_loss[:, 1:], config.get("token_level", "word")
             )
             preds_str = converter.decode(preds_index, config.get("token_level", "word"))
-
-            if tokenizer is not None:
-                labels = tokenizer.process_token_invert(labels)
-                preds_str = tokenizer.process_token_invert(preds_str)
 
             truth_tokens = converter.detokenize(text_for_loss[:, 1:])
             pred_tokens = converter.detokenize(preds_index)
@@ -107,7 +104,8 @@ def validation_step(
                 preds_max_prob.detach().cpu(),
                 torch.zeros((preds_max_prob.shape[1],)),
             ).tolist()
-            np_costs = costs.detach().cpu().numpy().tolist()
+            
+            np_costs = costs.cpu().numpy().tolist()
 
             for cost, img_name, gt, pred, pred_prob, pred_token, gt_token in zip(
                 np_costs,
@@ -131,8 +129,10 @@ def validation_step(
 
                 if config["export_csv"]:
                     writer.writerow((cost, img_name, pred, gt, 1 if pred == gt else 0))
+                    
                 norm_ED += ed.get_single_ED(gt, pred)
                 word_ED += ed.get_word_NED(pred, gt)
+                
                 total_names.append(img_name)
                 total_labels.append(gt)
                 total_preds.append(pred)
@@ -147,13 +147,14 @@ def validation_step(
                 labels, batch_max_length=config["batch_max_length"]
             )
             if config["use_amp"]:
-                with torch.cuda.amp.autocast():
+                with torch.autocast(device_type=device):
                     preds_index, preds, _ = model(image_tensors, text_for_pred)
             else:
                 preds_index, preds, _ = model(image_tensors, text_for_pred)
 
             forward_time = time.time() - start_time
             infer_time += forward_time
+            
             target = text_for_loss[:, 1:]  # without [GO] Symbol
             costs = criterion(
                 preds.contiguous().view(-1, preds.shape[-1]),
@@ -168,12 +169,9 @@ def validation_step(
             )
             preds_str = converter.decode(preds_index, config.get("token_level", "word"))
 
-            if tokenizer is not None:
-                labels = tokenizer.process_token_invert(labels)
-                preds_str = tokenizer.process_token_invert(preds_str)
-
             truth_tokens = converter.detokenize(text_for_loss[:, 1:])
             pred_tokens = converter.detokenize(preds_index)
+            
             # calculate accuracy & confidence score
             preds_prob = F.softmax(preds, dim=2)
             preds_max_prob, _ = preds_prob.max(dim=2)
@@ -183,6 +181,7 @@ def validation_step(
                 preds_max_prob.detach().cpu(),
                 torch.zeros((preds_max_prob.shape[1],)),
             ).tolist()
+            
             np_costs = costs.detach().cpu().numpy().tolist()
 
             for cost, img_name, gt, pred, pred_prob, pred_token, gt_token in zip(
@@ -207,6 +206,7 @@ def validation_step(
 
                 if config["export_csv"]:
                     writer.writerow((cost, img_name, pred, gt, 1 if pred == gt else 0))
+                    
                 norm_ED += ed.get_single_ED(gt, pred)
                 word_ED += ed.get_word_NED(pred, gt)
                 total_names.append(img_name)
@@ -223,7 +223,7 @@ def validation_step(
     word_ED = word_ED / float(length_of_data)
 
     if config.get("token_level", "word") == "word":
-        bleu_score = metrics.bleu_score(
+        bleu_score = bleu.bleu_score(
             total_pred_tokens, [[s] for s in total_truth_tokens]
         )
     else:

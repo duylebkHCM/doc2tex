@@ -1,5 +1,5 @@
 from torch import nn
-from modules.loss.labelsmoothing import LabelSmoothingLoss
+from doc2tex.modules.loss.labelsmoothing import LabelSmoothingLoss
 from typing import Dict
 
 

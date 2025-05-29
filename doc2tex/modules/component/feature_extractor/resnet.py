@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from .addon_module.visual_attention import GlobalContext
-from utils.checkpoints import clean_state_dict
+from doc2tex.utils.checkpoints import clean_state_dict
 
 
 class BasicBlock(nn.Module):

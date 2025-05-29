@@ -10,7 +10,7 @@ mean: 0.5
 std: 0.5
 augment: True
 
-batch_size: 32
+batch_size: 16
 workers: -1
 postprocess: False
 
@@ -51,10 +51,10 @@ Prediction:
 export_csv: False
 sanity_check: False
 
-vocab: 'vocab.txt'
+vocab: '/media/hdd2/linhpv10/datasets/Math_Datasets/data_20211227_final/vocab.txt'
 character: []
-train_data: 'train_data'
-valid_data: 'validate_data'
+train_data: '/media/hdd2/linhpv10/datasets/Math_Datasets/data_20211227_final/train_data'
+valid_data: '/media/hdd2/linhpv10/datasets/Math_Datasets/data_20211227_final/validate_data'
 
 criterion:
   name: 'entropy'
