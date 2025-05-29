@@ -1,7 +1,7 @@
 import torch.nn as nn
-from modules.component.seq_modeling import BidirectionalLSTM, create_vit_modeling
-from modules.component.seq_modeling.bilstm import BiLSTM_Seq_Modeling
-from modules.component.common import PositionalEncoding2D, PositionalEncoding1D
+from doc2tex.modules.component.seq_modeling import BidirectionalLSTM, create_vit_modeling
+from doc2tex.modules.component.seq_modeling.bilstm import BiLSTM_Seq_Modeling
+from doc2tex.modules.component.common import PositionalEncoding2D, PositionalEncoding1D
 
 
 class SeqModelingBuilder(nn.Module):
@@ -43,7 +43,7 @@ class SeqModelingBuilder(nn.Module):
         output_shape = None
         pad_info = None
 
-        if self.flow["Seq"] != "BiLSTM":
+        if self.flow["Seq"] == "BiLSTM":
             contextual_feature = self.SequenceModeling(visual_feature)
 
             if hasattr(self, "image_positional_encoder"):

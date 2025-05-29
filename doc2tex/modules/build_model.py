@@ -1,7 +1,7 @@
 import torch.nn as nn
-from modules.recognizers.build_feat import FeatExtractorBuilder
-from modules.recognizers.build_seq import SeqModelingBuilder
-from modules.recognizers.build_pred import PredictBuilder
+from doc2tex.modules.recognizers.build_feat import FeatExtractorBuilder
+from doc2tex.modules.recognizers.build_seq import SeqModelingBuilder
+from doc2tex.modules.recognizers.build_pred import PredictBuilder
 
 
 class Model(nn.Module):

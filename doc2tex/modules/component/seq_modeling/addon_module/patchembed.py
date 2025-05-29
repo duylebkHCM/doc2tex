@@ -2,7 +2,7 @@ import math
 import torch.nn as nn
 import torch
 from torch.nn import functional as F
-from modules.component.common import to_2tuple
+from ...common import to_2tuple
 from typing import Tuple, Union, List
 
 

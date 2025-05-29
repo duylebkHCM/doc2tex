@@ -4,9 +4,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange, repeat
 from torch import FloatTensor, LongTensor
-from modules.component.prediction_head.addon_module import WordPosEnc
-from modules.converter.tfm_converter import TFMLabelConverter as TFM
-from tools.beam import Beam
+from .addon_module import WordPosEnc
+from ...converter.tfm_converter import TFMLabelConverter as TFM
+from doc2tex.tools.beam import Beam
 
 
 def _build_transformer_decoder(

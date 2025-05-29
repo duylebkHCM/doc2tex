@@ -41,57 +41,73 @@ def train(config, args, log_dir, device):
     data_iter = iter(train_loader)
     model.zero_grad()
 
-    while True:
-        # train part
-        cur_lr, train_loss_avg = train_one_step(
-            train_loader,
-            data_iter,
-            configimizer,
-            criterion,
-            converter,
-            config,
-            iteration,
-            device,
-            augment,
-            model,
-            scaler,
-            config["scheduler"],
-            train_loss_avg,
-        )
-
-        # validation part
-        if ((iteration + 1) % config.get("accum_grad", 1) == 0) and (
-            ((iteration + 1) % config["valInterval"] == 0) or iteration == 0
-        ):  # To see training progress, we also conduct validation when 'iteration == 0'
-            best_accuracy, best_bleu, best_norm_ED, best_word_ED = validation(
-                iteration,
-                model,
+    # for log
+    with open(f"{log_dir}/log_train.txt", "a") as log:
+        while True:
+            # train part
+            try:
+                batch = next(data_iter)
+            except StopIteration:
+                data_iter = iter(train_loader)
+                batch = next(data_iter)
+                
+            cur_lr, train_loss_avg = train_one_step(
+                batch,
                 configimizer,
-                cur_lr,
-                log_dir,
-                start_time,
-                augment,
                 criterion,
-                valid_loader,
                 converter,
                 config,
-                args,
+                iteration,
                 device,
+                augment,
+                model,
+                scaler,
+                config["scheduler"],
                 train_loss_avg,
-                best_accuracy,
-                best_bleu,
-                best_norm_ED,
-                best_word_ED,
             )
 
-        if (iteration + 1) == config["num_iter"]:
-            print("end the training")
-            sys.exit()
+            if (iteration + 1) % 100 == 0 or iteration == 0:
+                elapsed_time = time.time() - start_time
+                loss_log = f'[{iteration+1}/{config["num_iter"]}] Train loss: {train_loss_avg.val():0.5f}, Learning rate: {cur_lr:0.5f}, Total_elapsed_time: {elapsed_time:0.5f}'
+                print(loss_log)
+                log.write(loss_log+'\n')
 
-        iteration += 1
+            # validation part
+            if ((iteration + 1) % config.get("accum_grad", 1) == 0) and (
+                ((iteration + 1) % config["valInterval"] == 0) or iteration == 0
+            ):
+                best_accuracy, best_bleu, best_norm_ED, best_word_ED = validation(
+                    iteration,
+                    model,
+                    configimizer,
+                    cur_lr,
+                    log_dir,
+                    start_time,
+                    augment,
+                    criterion,
+                    valid_loader,
+                    converter,
+                    config,
+                    args,
+                    device,
+                    train_loss_avg,
+                    best_accuracy,
+                    best_bleu,
+                    best_norm_ED,
+                    best_word_ED,
+                    log
+                )
 
-        if config["sanity_check"]:
-            break
+            if (iteration + 1) == config["num_iter"]:
+                print("end the training")
+                sys.exit()
+
+            iteration += 1
+
+            if config["sanity_check"]:
+                break
+            
+    log.close()
 
 
 if __name__ == "__main__":
@@ -136,7 +152,9 @@ if __name__ == "__main__":
     else:
         config["num_gpu"] = 0
         device = "cpu"
-
+        
+    config["device"] = device
+    
     if config["workers"] <= 0:
         config["workers"] = (os.cpu_count() // 2) // config["num_gpu"]
 

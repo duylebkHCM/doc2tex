@@ -1,14 +1,14 @@
 import torch.nn as nn
 import torch
 from torch.nn import functional as F
-from modules.component.seq_modeling.vit.utils import trunc_normal_
-from modules.component.seq_modeling.vit.vision_transformer import VisionTransformer
-from modules.component.seq_modeling.addon_module import *
-from modules.component.feature_extractor import (
+from .vit.utils import trunc_normal_
+from .vit.vision_transformer import VisionTransformer
+from .addon_module import *
+from ..feature_extractor import (
     ResNet_FeatureExtractor,
     VGG_FeatureExtractor,
 )
-from modules.component.common.mae_posembed import get_2d_sincos_pos_embed
+from ..common.mae_posembed import get_2d_sincos_pos_embed
 
 __all__ = [
     "ViTEncoder",
@@ -294,16 +294,16 @@ def create_vit_modeling(opt):
     )
     if seq_modeling["patching_style"] == "2d":
         if seq_modeling.get("fix_embed", False):
-            encoder = ViTEncoderV3
+            seq_encoder = ViTEncoderV3
         else:
             if not seq_modeling.get("interpolate_embed", True):
-                encoder = ViTEncoderV2
+                seq_encoder = ViTEncoderV2
             else:
-                encoder = ViTEncoder
+                seq_encoder = ViTEncoder
     else:
-        encoder = TRIGBaseEncoder
+        seq_encoder = TRIGBaseEncoder
 
-    encoder_seq_modeling = encoder(
+    encoder_seq_modeling = seq_encoder(
         img_size=max_dimension,
         patch_size=seq_modeling["patch_size"],
         in_chans=seq_modeling["input_channel"],

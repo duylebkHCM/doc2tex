@@ -13,13 +13,12 @@ import torch.utils.data
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
 from torch.utils.data import Dataset
-from torchtext.data import metrics
 from nltk.metrics.distance import edit_distance
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from doc2tex.modules.converter import builder
 from doc2tex.modules.build_model import Model
-from doc2tex.modules.metrics import ed
+from doc2tex.modules.metrics import ed, bleu
 from doc2tex.utils.predict_utils import resize
 from doc2tex.utils.data_utils import Postprocessing
 from doc2tex.utils.model_utils import load_checkpoint
@@ -224,7 +223,7 @@ def run_infer(model, evaluation_loader, converter, tokenizer, config, args):
         cur_word_ED = ed.get_word_NED(pred, gt)
         word_ED += cur_word_ED
 
-        cur_bleu = metrics.bleu_score(
+        cur_bleu = bleu.bleu_score(
             candidate_corpus=[pred_token], references_corpus=[[truth_token]]
         )
 
@@ -246,7 +245,7 @@ def run_infer(model, evaluation_loader, converter, tokenizer, config, args):
     norm_ED = norm_ED / float(length_of_data)  # ICDAR2019 Normalized Edit Distance
     word_ED = word_ED / float(length_of_data)
     if config.get("token_level", "word") == "word":
-        bleu_score = metrics.bleu_score(
+        bleu_score = bleu.bleu_score(
             total_pred_tokens, [[s] for s in total_truth_tokens]
         )
     else:

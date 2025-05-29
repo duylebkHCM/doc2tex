@@ -1,5 +1,5 @@
 import torch.nn as nn
-from modules.component.feature_extractor import (
+from doc2tex.modules.component.feature_extractor import (
     VGG_FeatureExtractor,
     ResNet_FeatureExtractor,
 )

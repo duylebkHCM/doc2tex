@@ -1,5 +1,5 @@
 import torch.nn as nn
-from modules.component.prediction_head import (
+from doc2tex.modules.component.prediction_head import (
     Attention,
     AttentionV2,
     TransformerPrediction,
